@@ -154,6 +154,7 @@ initialize_server_options(ServerOptions *options)
 	options->max_startups = -1;
 	options->max_authtries = -1;
 	options->max_sessions = -1;
+	options->permit_multiplex_session = -1;
 	options->banner = NULL;
 	options->use_dns = -1;
 	options->client_alive_interval = -1;
@@ -373,6 +374,8 @@ fill_default_server_options(ServerOptions *options)
 		options->max_authtries = DEFAULT_AUTH_FAIL_MAX;
 	if (options->max_sessions == -1)
 		options->max_sessions = DEFAULT_SESSIONS_MAX;
+	if (options->permit_multiplex_session == -1)
+		options->permit_multiplex_session = 1;
 	if (options->use_dns == -1)
 		options->use_dns = 0;
 	if (options->client_alive_interval == -1)
@@ -476,7 +479,7 @@ typedef enum {
 	sIgnoreUserKnownHosts, sCiphers, sMacs, sPidFile,
 	sGatewayPorts, sPubkeyAuthentication, sPubkeyAcceptedKeyTypes,
 	sXAuthLocation, sSubsystem, sMaxStartups, sMaxAuthTries, sMaxSessions,
-	sBanner, sUseDNS, sHostbasedAuthentication,
+	sPermitMultiplexSession, sBanner, sUseDNS, sHostbasedAuthentication, 
 	sHostbasedUsesNameFromPacketOnly, sHostbasedAcceptedKeyTypes,
 	sHostKeyAlgorithms,
 	sClientAliveInterval, sClientAliveCountMax, sAuthorizedKeysFile,
@@ -602,6 +605,7 @@ static struct {
 	{ "maxstartups", sMaxStartups, SSHCFG_GLOBAL },
 	{ "maxauthtries", sMaxAuthTries, SSHCFG_ALL },
 	{ "maxsessions", sMaxSessions, SSHCFG_ALL },
+	{ "permitmultiplexsession", sPermitMultiplexSession, SSHCFG_GLOBAL },
 	{ "banner", sBanner, SSHCFG_ALL },
 	{ "usedns", sUseDNS, SSHCFG_GLOBAL },
 	{ "verifyreversemapping", sDeprecated, SSHCFG_GLOBAL },
@@ -1784,6 +1788,10 @@ process_server_config_line(ServerOptions *options, char *line,
 	case sMaxSessions:
 		intptr = &options->max_sessions;
 		goto parse_int;
+
+	case sPermitMultiplexSession:
+		intptr = &options->permit_multiplex_session;
+		goto parse_flag;
 
 	case sBanner:
 		charptr = &options->banner;

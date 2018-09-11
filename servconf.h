@@ -163,6 +163,7 @@ typedef struct {
 	int	max_startups;
 	int	max_authtries;
 	int	max_sessions;
+	int	permit_multiplex_session; /* if false, do not allow multiplex session */
 	char   *banner;			/* SSH-2 banner message */
 	int	use_dns;
 	int	client_alive_interval;	/*
